@@ -7,3 +7,8 @@
 <MyButton text="Very cool button"/>
 <MyOtherButton deez="Hello World"/>
 <MyThirdComponent/>
+
+<Icons.Account/>
+<Icons.Home/>
+<Icons.Generic name="Generic"/>
+<Icons.Generic name="Other"/>
