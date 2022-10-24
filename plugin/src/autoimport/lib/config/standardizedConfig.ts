@@ -2,8 +2,8 @@ import { AutoimportConfig, AutoimportUserConfig } from "../../types.js";
 import path from 'path'
 
 
-export function standardizeConfing(userConfig : AutoimportUserConfig) : AutoimportConfig {
-    const config : AutoimportConfig = {
+export function standardizeConfing(userConfig: AutoimportUserConfig): AutoimportConfig {
+    const config: AutoimportConfig = {
         include: userConfig.include ?? ['**/*.svelte'],
         exclude: userConfig.exclude ?? [],
         module: {},
@@ -11,20 +11,20 @@ export function standardizeConfing(userConfig : AutoimportUserConfig) : Autoimpo
         components: []
     }
 
-    if(userConfig.components) {
-        for(const component of userConfig.components) {
-            if(typeof component !== "string") config.components.push({
+    if (userConfig.components) {
+        for (const component of userConfig.components) {
+            if (typeof component !== "string") config.components.push({
                 directory: path.resolve(component.directory),
-                flat: component.flat ?? false,
-                prefix: component.prefix ?? ""
+                prefix: component.prefix ?? "",
+                namingStrategy: component.namingStrategy ?? "namespaced"
             });
-            else config.components.push({directory: path.resolve(component), flat: false, prefix: ""});
+            else config.components.push({ directory: path.resolve(component), prefix: "", namingStrategy: "namespaced" });
         }
     }
 
-    if(userConfig.module) {
+    if (userConfig.module) {
         Object.entries(userConfig.module).forEach(([moduleName, moduleImport]) => {
-            if(typeof moduleImport === "string") moduleImport = [moduleImport];
+            if (typeof moduleImport === "string") moduleImport = [moduleImport];
             config.module[moduleName] = moduleImport;
         })
     }

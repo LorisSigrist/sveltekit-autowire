@@ -5,7 +5,16 @@ import { autowire } from 'sveltekit-autowire'
 const config: UserConfig = {
 	plugins: [autowire({
 		autoimport: {
-			components: [{ directory: './src/lib/myComponents', flat: true }],
+			components: [
+				{ 
+					directory: './src/lib/myComponents', 
+					namingStrategy: "flat" 
+				},
+				{
+					directory: './src/lib/nestedComponents',
+					namingStrategy: "directory"
+				}
+			],
 			module: {
 				"svelte": ["onMount"],
 				"$lib/Icons": "* as Icons"

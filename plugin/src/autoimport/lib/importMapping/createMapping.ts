@@ -1,6 +1,6 @@
 import { normalizePath } from "vite";
 import { traverse } from "../moduleResolution/fsTraversal.js";
-import { getModuleName } from "../moduleResolution/moduleNaming.js";
+import { getComponentName } from "../moduleResolution/componentNaming.js";
 import path from 'path';
 import { ComponentsConfig, ImportMapping, MappingConfig, ModuleConfig, TypeDeclarationMapping } from "../../types.js";
 
@@ -25,21 +25,22 @@ export function createMapping(components: ComponentsConfig, module: ModuleConfig
           relative to any modules they might be imported from.
         */
         traverse(component.directory, filter, filePath => {
-            let moduleName = getModuleName(component.directory, filePath, component.flat, component.prefix);
+            let componentName = getComponentName(component.directory, filePath, component.namingStrategy, component.prefix);
 
-            importMapping[moduleName] = target => {
-                let moduleFrom = normalizePath(path.relative(target, filePath));
-                if (!moduleFrom.startsWith('.')) {
-                    moduleFrom = './' + moduleFrom;
+            importMapping[componentName] = target => {
+                let componentFrom = normalizePath(path.relative(target, filePath));
+                if (!componentFrom.startsWith('.')) {
+                    componentFrom = './' + componentFrom;
                 }
-                return `import ${moduleName} from '${moduleFrom}'`
+                return `import ${componentName} from '${componentFrom}'`
             }
-            componentTypeDeclarations[moduleName] = target => {
-                let moduleFrom = normalizePath(path.relative(target, filePath));
-                if (!moduleFrom.startsWith('.')) {
-                    moduleFrom = './' + moduleFrom;
+
+            componentTypeDeclarations[componentName] = target => {
+                let componentFrom = normalizePath(path.relative(target, filePath));
+                if (!componentFrom.startsWith('.')) {
+                    componentFrom = './' + componentFrom;
                 }
-                return `declare const ${moduleName}: typeof import("${moduleFrom}")["default"];`
+                return `declare const ${componentName}: typeof import("${componentFrom}")["default"];`
             }
         });
     });

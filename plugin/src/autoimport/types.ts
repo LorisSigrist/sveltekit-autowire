@@ -9,22 +9,40 @@ export type ImportMapping = Record<string, ((target: string) => string)>;
 export type TypeDeclarationMapping = Record<string, ((target: string) => string)>;
 
 export type ComponentsUserConfig = string | {
-    /** A relative or absolute path to a component, or a directory in which to look for components */
+    /** 
+     * A relative or absolute path to a component, or a directory in which to look for components 
+     */
     directory: string,
-    /** Do not prefix with directories */
-    flat?: boolean,
-    /**  Prefix for the components in `directory`*/
-    prefix?: string
+
+    /**
+     * Which strategy to use for generating Tag names
+     * @description
+     * - `flat` - Use the CamelCased Component name      
+     * - `directory` - Use a CamelCased version of the relative Path to the component    
+     * - `namespaced` Use the folders in the relative path to the component as namespaces     
+     * @example
+     * - flat : `folder/My-Component.svelte` -> `<MyComponent>`
+     * - directory : `folder/My-Component.svelte` -> `<FolderMyComponent>`
+     * - namespaced : `folder/My-Component.svelte` -> `<Folder.MyComponent>`
+     * 
+     * @default "namespaced"
+     */
+    namingStrategy: "flat" | "namespaced" | "directory"
+
+    /** 
+     * Prefix for the components in `directory`
+     */
+    prefix?: string,
 }[]
 
 export type ComponentsConfig = {
     /**  ABSOLUTE path to the directory */
     directory: string,
-    flat: boolean,
-    prefix: string
+    namingStrategy: "flat" | "namespaced" | "directory"
+    prefix: string,
 }[]
 
-export type MappingUserConfig =  Record<string, string>;
+export type MappingUserConfig = Record<string, string>;
 export type MappingConfig = MappingUserConfig;
 
 export type ModuleConfig = Record<string, string[]>;

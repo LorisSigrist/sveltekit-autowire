@@ -1,6 +1,6 @@
 <script lang="ts">
     onMount(()=>{
-        console.log("Hello world from on-mount")
+        alert("Hello world from on-mount")
     })
 </script>
 
@@ -12,3 +12,5 @@
 <Icons.Home/>
 <Icons.Generic name="Generic"/>
 <Icons.Generic name="Other"/>
+
+<NestedComponent/>
