@@ -3,7 +3,7 @@ import {writeFileSync, mkdirSync} from 'fs'
 import { TypeDeclarationMapping } from '../types.js'
 
 const DTS_DIR='./.svelte-kit/'
-const DTS_NAME='components.d.ts'
+const DTS_NAME='autowire.d.ts'
 
 export function writeTypeDeclarations(typeDeclarations: TypeDeclarationMapping) {
     let declarationStatements : string[] = [];

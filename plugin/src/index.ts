@@ -9,6 +9,8 @@ export function autowire(config: AutowireUserConfig): Plugin[] {
     if (config.autoimport !== false) {
         plugins.push(autoimport(config.autoimport))
     }
-    plugins.push(overrideTsConfig())
+    plugins.push(overrideTsConfig({
+        includeDTSFiles: ["autowire.d.ts"]
+    }))
     return plugins;
 }

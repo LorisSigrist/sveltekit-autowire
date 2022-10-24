@@ -1,10 +1,12 @@
-import { FSWatcher, Plugin } from "vite";
+import { Plugin } from "vite";
 import { readFileSync, existsSync, writeFileSync } from 'fs'
 import path from 'path'
+import type { TsConfigPluginConfig } from "./types.js";
 
-const TS_CONFIG_PAH = path.resolve("./.svelte-kit/tsconfig.json")
+export function overrideTsConfig(pluginConfig: TsConfigPluginConfig): Plugin {
 
-export function overrideTsConfig(): Plugin {
+    if(!pluginConfig.tsConfigPath) pluginConfig.tsConfigPath = "./.svelte-kit/tsconfig.json"
+    pluginConfig.tsConfigPath = path.resolve(pluginConfig.tsConfigPath);
 
     function createTsConfig() {
         console.log("TODO: createTsConfig")
@@ -12,20 +14,23 @@ export function overrideTsConfig(): Plugin {
 
     function fixTsConfig() {
         try {
-            if(!existsSync(TS_CONFIG_PAH)) {
+            if(!existsSync(pluginConfig.tsConfigPath)) {
                 createTsConfig();
                 return;
             }
 
-            const content = readFileSync(TS_CONFIG_PAH, { encoding: "utf-8" });
+            const content = readFileSync(pluginConfig.tsConfigPath, { encoding: "utf-8" });
             const config: any = JSON.parse(content);
 
             if (!Array.isArray(config.include)) throw Error("No valid include field specified in tsconfig")
-            if (config.include.includes("components.d.ts")) return //Already set up
-            config.include.push("components.d.ts");
+            
+            pluginConfig.includeDTSFiles.forEach(file => {
+                if(config.include.includes(file)) return;
+                config.include.push(file);
+            })
 
             const tsConfig = JSON.stringify(config);
-            writeFileSync(TS_CONFIG_PAH, tsConfig, {encoding: "utf-8"})
+            writeFileSync(pluginConfig.tsConfigPath, tsConfig, {encoding: "utf-8"})
 
         } catch (e) {
             console.error(e);
@@ -36,7 +41,7 @@ export function overrideTsConfig(): Plugin {
         name: "autowire-tsconfig",
         configureServer(server) {
             server.watcher
-                .add(TS_CONFIG_PAH)
+                .add(pluginConfig.tsConfigPath)
                 .on("change", fixTsConfig)
                 .on('add', fixTsConfig)
                 .on("ready", fixTsConfig)
