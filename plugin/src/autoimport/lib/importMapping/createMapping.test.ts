@@ -8,7 +8,7 @@ describe("componentMapping", () => {
             "module": ["* as Namespace"]
         }
         const [importMapping, typeDeclarationMapping] = createMapping([], moduleConfig, {}, () => false);
-        const importStatement = importMapping["Namespace"]("/");
+        const importStatement = importMapping["Namespace"].importFactory("/");
         const typeDeclaration = typeDeclarationMapping["Namespace"]("/");
 
         expect(importStatement).toBe("import * as Namespace from 'module'");
@@ -19,7 +19,7 @@ describe("componentMapping", () => {
             "module": ["origin as alias"]
         }
         const [importMapping, typeDeclarationMapping] = createMapping([], moduleConfig, {}, () => false);
-        const importStatement = importMapping["alias"]("/");
+        const importStatement = importMapping["alias"].importFactory("/");
         const typeDeclaration = typeDeclarationMapping["alias"]("/");
 
         expect(importStatement).toBe("import { origin as alias } from 'module'");
@@ -30,7 +30,7 @@ describe("componentMapping", () => {
             "module": ["name"]
         }
         const [importMapping, typeDeclarationMapping] = createMapping([], moduleConfig, {}, () => false);
-        const importStatement = importMapping["name"]("/");
+        const importStatement = importMapping["name"].importFactory("/");
         const typeDeclaration = typeDeclarationMapping["name"]("/");
 
         expect(importStatement).toBe("import { name } from 'module'");

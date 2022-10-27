@@ -34,8 +34,6 @@ export default function autowire(userConfig: AutoimportUserConfig = {}): Plugin 
   }
 
 
-  updateMapping();
-
   return {
     name: 'sveltekit-autowire',
 
@@ -45,6 +43,7 @@ export default function autowire(userConfig: AutoimportUserConfig = {}): Plugin 
     async configResolved(config) {
       enforcePluginOrdering(config.plugins);
       svelteConfig = await resolveSvelteConfig(config);
+      updateMapping();
     },
 
     async transform(code, filename) {

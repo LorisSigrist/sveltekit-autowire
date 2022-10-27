@@ -1,3 +1,8 @@
+<!--
+    @component
+    Hello World
+    
+-->
 <script lang="ts">
     export let name = "Account"
 </script>

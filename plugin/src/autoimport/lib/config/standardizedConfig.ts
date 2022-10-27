@@ -15,10 +15,10 @@ export function standardizeConfing(userConfig: AutoimportUserConfig): Autoimport
         for (const component of userConfig.components) {
             if (typeof component !== "string") config.components.push({
                 directory: path.resolve(component.directory),
-                prefix: component.prefix ?? "",
+                namespace: component.namespace ?? "",
                 namingStrategy: component.namingStrategy ?? "namespaced"
             });
-            else config.components.push({ directory: path.resolve(component), prefix: "", namingStrategy: "namespaced" });
+            else config.components.push({ directory: path.resolve(component), namespace: "", namingStrategy: "namespaced" });
         }
     }
 

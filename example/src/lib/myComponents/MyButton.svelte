@@ -1,3 +1,7 @@
+<!--
+  @component
+  This is a very cool button
+-->
 <script lang="ts">
   /**
    * Very cool string

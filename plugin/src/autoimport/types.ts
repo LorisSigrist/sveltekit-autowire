@@ -1,11 +1,15 @@
-import type { preprocess, parse } from 'svelte/compiler'
+import type { parse } from 'svelte/compiler'
 import type { Plugin } from 'vite'
 
 //@ts-ignore
 export type Config = Parameters<Plugin["configResolved"]>[0];
-export type Preprocessor = Parameters<typeof preprocess>[1];
 export type Ast = ReturnType<typeof parse>
-export type ImportMapping = Record<string, ((target: string) => string)>;
+export type ImportMapping = Record<
+    string, {
+        "namespaces":string[],
+        "importFactory": (importerPath: string, name?: string) => string
+    }
+>;
 export type TypeDeclarationMapping = Record<string, ((target: string) => string)>;
 
 export type ComponentsUserConfig = string | {
@@ -30,16 +34,16 @@ export type ComponentsUserConfig = string | {
     namingStrategy: "flat" | "namespaced" | "directory"
 
     /** 
-     * Prefix for the components in `directory`
+     * Base namespace for the components in `directory`
      */
-    prefix?: string,
+    namespace?: string,
 }[]
 
 export type ComponentsConfig = {
     /**  ABSOLUTE path to the directory */
     directory: string,
     namingStrategy: "flat" | "namespaced" | "directory"
-    prefix: string,
+    namespace: string,
 }[]
 
 export type MappingUserConfig = Record<string, string>;
