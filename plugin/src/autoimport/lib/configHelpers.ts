@@ -1,7 +1,8 @@
 import { normalizePath, Plugin } from 'vite'
 import path from 'path'
 import { fileURLToPath } from 'url';
-import { Config, Preprocessor } from '../types.js';
+import { Config } from '../types.js';
+import type {Config as SvelteConfig} from '@sveltejs/kit'
 
 /**
  * Enforces the order in which the plugins are definesd in the user's vite.config.js file
@@ -18,19 +19,21 @@ export function enforcePluginOrdering(plugins: readonly Plugin[]) {
   }
 }
 
-/**
- * Returns the preprocessor defined in the user's `svelte.config.js` file, if it exists
- * @param config - The config obtained from configResolved 
- */
-export async function resolveSveltePreprocessor(config: Config): Promise<Preprocessor | undefined> {
+export async function resolveSvelteConfig(config: Config) : Promise<SvelteConfig> {
+
+  const defaultConfig : SvelteConfig= {
+    extensions: [".svelte"]
+  }
+
   try {
     let dirname = path.dirname(fileURLToPath(import.meta.url));
     let relative = path.relative(dirname, config.inlineConfig.root || config.root);
     let configFile = path.join(relative, './svelte.config.js');
     let pkg = await import(normalizePath('./' + configFile));
-    return pkg.default.preprocess || [];
+    const svelteConfig: SvelteConfig = pkg.default ?? defaultConfig
+    return svelteConfig;
   } catch (e) {
     console.warn('Error reading svelte.config.js');
-    return undefined;
+    return defaultConfig;
   }
 }

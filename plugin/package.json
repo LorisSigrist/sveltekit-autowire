@@ -32,7 +32,8 @@
   },
   "peerDependencies": {
     "vite" : "*",
-    "svelte": "*"
+    "svelte": "*",
+    "@sveltejs/kit" : "*"
   },
   "files": [
     "dist/**",

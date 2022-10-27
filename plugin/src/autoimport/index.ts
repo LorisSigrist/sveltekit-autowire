@@ -1,12 +1,13 @@
 import { createFilter } from '@rollup/pluginutils';
 import type { Plugin } from 'vite'
-import { enforcePluginOrdering, resolveSveltePreprocessor } from './lib/configHelpers.js';
-import type { ImportMapping, AutoimportUserConfig, Preprocessor, TypeDeclarationMapping } from './types.js';
+import { enforcePluginOrdering, resolveSvelteConfig } from './lib/configHelpers.js';
+import type { ImportMapping, AutoimportUserConfig, TypeDeclarationMapping } from './types.js';
 import { genrateAST } from './lib/transformHelpers.js';
 import { transformCode } from './lib/transformCode.js';
 import { createMapping } from './lib/importMapping/createMapping.js';
 import { standardizeConfing } from './lib/config/standardizedConfig.js';
 import { writeTypeDeclarations } from './lib/writeTypeDeclarations.js';
+import { type  Config as SvelteConfig } from '@sveltejs/kit';
 
 export default function autowire(userConfig: AutoimportUserConfig = {}): Plugin {
 
@@ -24,7 +25,7 @@ export default function autowire(userConfig: AutoimportUserConfig = {}): Plugin 
   const componentPaths: any[] = components.map(comp => comp.directory);
 
   let importMapping: ImportMapping = {};
-  let sveltePreprocessor: Preprocessor | undefined;
+  let svelteConfig : SvelteConfig;
 
   function updateMapping() {
     let componentTypeDeclarations : TypeDeclarationMapping; 
@@ -43,12 +44,12 @@ export default function autowire(userConfig: AutoimportUserConfig = {}): Plugin 
     // Must be processed before vite-plugin-svelte
     async configResolved(config) {
       enforcePluginOrdering(config.plugins);
-      sveltePreprocessor = await resolveSveltePreprocessor(config);
+      svelteConfig = await resolveSvelteConfig(config);
     },
 
     async transform(code, filename) {
       if (!filter(filename)) return;
-      const ast = await genrateAST(code, sveltePreprocessor, filename)
+      const ast = await genrateAST(code, svelteConfig.preprocess, filename)
       const result = transformCode(code, ast, filename, importMapping);
       return result;
     },
