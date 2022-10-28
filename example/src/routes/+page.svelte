@@ -13,9 +13,9 @@
 
 <Scoped.ASD />
 
-<MyButton text="Very cool button"/>
-<MyOtherButton deez="Hello World"/>
-<MyThirdComponent/>
+<Comp.MyButton text="Very cool button"/>
+<Comp.MyOtherButton deez="Hello World"/>
+<Comp.MyThirdComponent/>
 
 <Icons.Account/>
 <Icons.Home/>

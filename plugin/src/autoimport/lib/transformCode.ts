@@ -6,15 +6,15 @@ import crypto from 'crypto'
 
 export function transformCode(code: string, ast: Ast | undefined, filePath: string, importMapping: ImportMapping) {
     const { imported, maybeUsed, declared } = walkAST(ast);
-
-    /* A list of import statements that need to be added to the current file */
+    
     const usedImports: ImportMapping = {}
     Object.entries(importMapping).forEach(([name, importDescription]) => {
+        const nameOrNamespace = importDescription.namespaces[0] ?? name;
 
-        if (/\W/.test(name)) return;    //If the ModuleName contains whitespace, it's invalid
-        if (imported.has(name)) return; //If the module is already imported in this file, skip adding the import
-        if (declared.has(name)) return; //If the module is declared in this file, don't add an import
-        if (!maybeUsed.has(name)) return; //If there is no way for this module to be used in this file, don't import it
+        if (/\W/.test(nameOrNamespace)) return;    //If the ModuleName contains whitespace, it's invalid
+        if (imported.has(nameOrNamespace)) return; //If the module is already imported in this file, skip adding the import
+        if (declared.has(nameOrNamespace)) return; //If the module is declared in this file, don't add an import
+        if (!maybeUsed.has(nameOrNamespace)) return;//If there is no way for this module to be used in this file, don't import it
 
         usedImports[name] = importDescription;
     });
@@ -53,11 +53,17 @@ function generateImportStatements(filePath: string, importMapping: ImportMapping
             importAs = name + "_AUTOWIRE_" + crypto.createHash("md5").update(name + filePath).digest("hex").toUpperCase();
             importAs = importAs.slice(0, 254); //Maximum variable name length allowed by javascript
 
-            aliases[name] = importAs;
+            if(importDescription.namespaces.length == 1) {
+                const ns = importDescription.namespaces[0];
+                if(!aliases[ns]) aliases[ns] = {};
+                aliases[ns][name] = importAs;
+            }else {
+                aliases[name] = importAs;
+            }
         }
         importStatements.push(importDescription.importFactory(path.dirname(filePath), importAs))
     })
-    
+
     Object.entries(aliases).forEach(([name, aliases]) => {
         aliasStatements.push(`const ${name} = ${createAliasObjectLiteral(aliases)};`)
     })

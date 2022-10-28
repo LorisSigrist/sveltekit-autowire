@@ -8,7 +8,8 @@ const config: UserConfig = {
 			components: [
 				{ 
 					directory: './src/lib/myComponents', 
-					namingStrategy: "flat" 
+					namingStrategy: "flat" ,
+					"namespace": "Comp"
 				},
 				{
 					directory: './src/lib/nestedComponents',
