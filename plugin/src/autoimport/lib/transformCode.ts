@@ -49,16 +49,17 @@ function generateImportStatements(filePath: string, importMapping: ImportMapping
     const aliases = {};
     Object.entries(importMapping).forEach(([name, importDescription]) => {
         let importAs = name;
-        if(importDescription.namespaces.length !== 0) {
-            importAs = "AUTOWIRE_" + name + "_" + crypto.createHash("md5").update(name + filePath).digest("hex").toUpperCase();
+        if (importDescription.namespaces.length !== 0) {
+            importAs = name + "_AUTOWIRE_" + crypto.createHash("md5").update(name + filePath).digest("hex").toUpperCase();
+            importAs = importAs.slice(0, 254); //Maximum variable name length allowed by javascript
+
             aliases[name] = importAs;
         }
-        
         importStatements.push(importDescription.importFactory(path.dirname(filePath), importAs))
     })
-
+    
     Object.entries(aliases).forEach(([name, aliases]) => {
-        aliasStatements.push(`const ${name} = ${aliasesObject(aliases)};`)
+        aliasStatements.push(`const ${name} = ${createAliasObjectLiteral(aliases)};`)
     })
 
     const importStatementBlock = importStatements.join("\n");
@@ -74,12 +75,16 @@ function generateImportStatements(filePath: string, importMapping: ImportMapping
     return importBlock;
 }
 
-function aliasesObject(aliases) : string {
-    if(typeof aliases === "string") {
+export function createAliasObjectLiteral(aliases): string {
+    if (typeof aliases === "string") {
         return `${aliases}`
     }
 
+    let literal = "{\n"
+
     Object.entries(aliases).forEach(([name, alias]) => {
-        return `{"${name}" : ${aliasesObject(alias)}}`
+        literal += `"${name}" : ${createAliasObjectLiteral(alias)},${"\n"}`
     })
+    literal += "}"
+    return literal;
 }
