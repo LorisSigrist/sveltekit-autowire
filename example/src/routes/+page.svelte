@@ -1,21 +1,11 @@
-<script lang="ts">
-    import Comp_Autowire_98172634 from './Comp.svelte'
-
-    const Scoped = {
-        ASD: Comp_Autowire_98172634
-    }
-
-    
+<script lang="ts">    
     onMount(()=>{
         console.log("Hello world from on-mount")
     })
 </script>
 
-<Scoped.ASD />
-
-<Comp.MyButton text="Very cool button"/>
-<Comp.MyOtherButton deez="Hello World"/>
-<Comp.MyThirdComponent/>
+<Comp.Nested1.Nested2.MyNestedComponent/>
+<Comp.Nested1.Nested2.Other/>
 
 <Icons.Account/>
 <Icons.Home/>

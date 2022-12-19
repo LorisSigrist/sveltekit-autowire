@@ -6,7 +6,7 @@ import crypto from 'crypto'
 
 export function transformCode(code: string, ast: Ast | undefined, filePath: string, importMapping: ImportMapping) {
     const { imported, maybeUsed, declared } = walkAST(ast);
-    
+
     const usedImports: ImportMapping = {}
     Object.entries(importMapping).forEach(([name, importDescription]) => {
         const nameOrNamespace = importDescription.namespaces[0] ?? name;
@@ -53,13 +53,15 @@ function generateImportStatements(filePath: string, importMapping: ImportMapping
             importAs = name + "_AUTOWIRE_" + crypto.createHash("md5").update(name + filePath).digest("hex").toUpperCase();
             importAs = importAs.slice(0, 254); //Maximum variable name length allowed by javascript
 
-            if(importDescription.namespaces.length == 1) {
-                const ns = importDescription.namespaces[0];
-                if(!aliases[ns]) aliases[ns] = {};
-                aliases[ns][name] = importAs;
-            }else {
-                aliases[name] = importAs;
+            let currentAliasLevel = aliases;
+            for (const ns of importDescription.namespaces) {
+                if (currentAliasLevel[ns] === undefined) {
+                    currentAliasLevel[ns] = {};
+                }
+                currentAliasLevel = currentAliasLevel[ns];
             }
+            currentAliasLevel[name] = importAs;
+
         }
         importStatements.push(importDescription.importFactory(path.dirname(filePath), importAs))
     })

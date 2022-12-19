@@ -6,19 +6,23 @@ const config: UserConfig = {
 	plugins: [autowire({
 		autoimport: {
 			components: [
-				{ 
-					directory: './src/lib/myComponents', 
-					namingStrategy: "flat" ,
-					"namespace": "Comp"
+				{
+					directory: './src/lib/myComponents',
+					namingStrategy: "namespaced",
+					namespace: "Comp"
 				},
 				{
 					directory: './src/lib/nestedComponents',
 					namingStrategy: "directory"
+				},
+				{
+					directory: "./src/lib/Icons",
+					namingStrategy: "flat",
+					namespace: "Icons"
 				}
 			],
 			module: {
 				"svelte": ["onMount"],
-				"$lib/Icons": "* as Icons"
 			}
 		}
 	}), sveltekit()]

@@ -33,12 +33,24 @@ export function getComponentName(rootPath: string, modulePath: string, namingStr
         if (parsed.name === 'index') {
             componentName = camelize(parsed.dir);
         } else {
-            componentName = camelize(parsed.dir + '_' + parsed.name);
+            componentName = camelize(parsed.dir) + camelize(parsed.name);
         }
     }
 
     else if (namingStrategy == "namespaced") {
-        throw new Error("Namespaced naming strategy is not yet implemented");
+        const parsed = (rootPath === modulePath)
+            ? path.parse(path.parse(modulePath).base)
+            : path.parse(path.relative(rootPath, modulePath));
+
+        const camelizedPath = parsed.dir.split("/").map(camelize)
+
+        if (parsed.name === 'index') {
+            componentName = camelizedPath.at(-1);
+            namespaces.push(...camelizedPath.slice(0, camelizedPath.length - 2))
+        } else {
+            componentName = camelize(parsed.name);
+            namespaces.push(...camelizedPath)
+        }
     }
 
     //If a base namespace is specified, add it at the start
