@@ -6,11 +6,14 @@ export type Config = Parameters<Plugin["configResolved"]>[0];
 export type Ast = ReturnType<typeof parse>
 export type ImportMapping = Record<
     string, {
-        "namespaces":string[],
+        "namespaces": string[],
         "importFactory": (importerPath: string, name?: string) => string
     }
 >;
-export type TypeDeclarationMapping = Record<string, ((target: string) => string)>;
+export type TypeDeclarationMapping = Record<string, {
+    "namespaces": string[],
+    "typeDefinitionFactory": ((importerPath: string, name?: string)  => string)
+}>;
 
 export type ComponentsUserConfig = string | {
     /** 

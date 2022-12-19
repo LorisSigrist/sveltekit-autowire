@@ -25,27 +25,34 @@ export function createMapping(components: ComponentsConfig, module: ModuleConfig
           relative to any modules they might be imported from.
         */
         traverse(component.directory, filter, filePath => {
-            const {componentName, namespaces} = getComponentName(component.directory, filePath, component.namingStrategy, component.namespace);
+            const { componentName, namespaces } = getComponentName(component.directory, filePath, component.namingStrategy, component.namespace);
 
             importMapping[componentName] = {
                 "namespaces": namespaces,
-                "importFactory": (importerPath: string, name: string) : string => {
+                "importFactory": (importerPath: string, name: string): string => {
                     let componentFrom = normalizePath(path.relative(importerPath, filePath));
                     if (!componentFrom.startsWith('.')) {
                         componentFrom = './' + componentFrom;
                     }
-                    return `import ${name} from '${componentFrom}'`
+                    return `import ${name ?? componentName} from '${componentFrom}'`
                 }
             }
-            
 
-            componentTypeDeclarations[componentName] = importerPath => {
-                let componentFrom = normalizePath(path.relative(importerPath, filePath));
-                if (!componentFrom.startsWith('.')) {
-                    componentFrom = './' + componentFrom;
+
+            componentTypeDeclarations[componentName] = {
+                "namespaces": namespaces,
+                "typeDefinitionFactory": (importerPath: string, name: string) => {
+
+                    let componentFrom = normalizePath(path.relative(importerPath, filePath));
+                    if (!componentFrom.startsWith('.')) {
+                        componentFrom = './' + componentFrom;
+                    }
+
+                    return `declare const ${name ?? componentName}: typeof import("${componentFrom}")["default"];`
                 }
-                return `declare const ${componentName}: typeof import("${componentFrom}")["default"];`
             }
+
+            
         });
     });
 
@@ -53,7 +60,7 @@ export function createMapping(components: ComponentsConfig, module: ModuleConfig
     Object.entries(module).forEach(([moduleFrom, moduleImports]) => {
         for (const moduleImport of moduleImports) {
             let typeDeclaration: () => string;
-            let importStatement: (filePath: string, name:string) => string;
+            let importStatement: (filePath: string, name: string) => string;
 
             //If an key is imported with "import x as y", we need to trigger an import on the alias y, not on the originx
             const [origin, alias] = moduleImport.split(/\s+as\s+/);
@@ -72,14 +79,17 @@ export function createMapping(components: ComponentsConfig, module: ModuleConfig
                 "namespaces": [],
                 "importFactory": importStatement
             }
-            componentTypeDeclarations[alias ?? origin] = typeDeclaration;
+            componentTypeDeclarations[alias ?? origin] = {
+                "namespaces": [],
+                "typeDefinitionFactory": typeDeclaration
+            }
         }
     })
 
     Object.entries(mapping).forEach(([name, value]) => {
         importMapping[name] = {
             "namespaces": [],
-            "importFactory": ()=>value
+            "importFactory": () => value
         }
     });
 

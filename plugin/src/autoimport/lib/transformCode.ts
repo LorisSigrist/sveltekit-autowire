@@ -47,12 +47,14 @@ function generateImportStatements(filePath: string, importMapping: ImportMapping
     const importStatements = [];
     const aliasStatements = [];
     const aliases = {};
+
+
     Object.entries(importMapping).forEach(([name, importDescription]) => {
         let importAs = name;
         if (importDescription.namespaces.length !== 0) {
             importAs = name + "_AUTOWIRE_" + crypto.createHash("md5").update(name + filePath).digest("hex").toUpperCase();
             importAs = importAs.slice(0, 254); //Maximum variable name length allowed by javascript
-
+            
             let currentAliasLevel = aliases;
             for (const ns of importDescription.namespaces) {
                 if (currentAliasLevel[ns] === undefined) {
@@ -79,7 +81,6 @@ function generateImportStatements(filePath: string, importMapping: ImportMapping
     if (aliasStatementBlock) blocks.push(aliasStatementBlock);
 
     const importBlock = blocks.join("\n\n");
-    console.log(importBlock);
     return importBlock;
 }
 
